@@ -1,6 +1,6 @@
 {
     "name": "yaroslawww/laravel-simple-image-manager",
-    "description": "Easy image manager for uploaded files",
+    "description": "Simple package to save multiple images formats when upload an image.",
     "keywords": [
         "laravel",
         "image"
