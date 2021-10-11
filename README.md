@@ -194,9 +194,8 @@ Avatar::make( 'Avatar' )
       return $model->avatarUpload( $request->file( $requestAttribute ),  /* second parameter can be something like "{$model->getKey()}-" . \Str::uuid() */ );
     } )
     ->maxWidth( 100 )
-    ->preview( function ( $value, $storageDisk, $model ) {
-      return $model->avatarUrl( 'small' );
-    } )
+    ->preview( fn ( $value, $storageDisk, $model ) => $model->avatarUrl( 'small' ))
+    ->thumbnail( fn ( $value, $storageDisk, $model ) => $model->avatarUrl( 'small' ))
     ->delete( function ( $request, $model, $storageDisk, $storagePath ) {
       $model->avatarDelete();
     } ),
