@@ -25,6 +25,7 @@ return [
     |
     | Driver supported options:
     | - *disk* - laravel filesystem disk (NOTE: currently package support only "local" disks)
+    | - *immutable_extensions* - Extensions what should not be changeable by library
     | - *prefix* - file name prefix (you can specify directory as prefix)
     | - *original* - original  file configuration. You can set as:
     |   - "false" - do not save original file
@@ -42,7 +43,8 @@ return [
         'avatars'        => [
             'disk'           => 'avatars',
             # 'prefix'         => 'some-folder/',
-            'original'       => [
+            'immutable_extensions' => ['.svg'],
+            'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 500, 500 ],
                     'optimize' => [],
@@ -65,8 +67,9 @@ return [
             ],
         ],
         'feature-images' => [
-            'disk'           => 'feature-images',
-            'original'       => [
+            'disk'                 => 'feature-images',
+            'immutable_extensions' => ['.svg'],
+            'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 2800, 1800 ],
                     'optimize' => [],

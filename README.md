@@ -64,18 +64,18 @@ if($isDeletedAll = SimpleImageManager::driver('avatars')->delete((string) $user-
 // app/Models/Traits/HasAvatar.php
 namespace App\Models\Traits;
 
+use Illuminate\Http\UploadedFile;
 use SimpleImageManager\Facades\SimpleImageManager;
 
-trait HasAvatar
-{
+trait HasAvatar {
+    
     /**
      * Driver name.
      *
      * @return string|null
      */
-    public function avatarManagerDriver(): ?string
-    {
-        if (property_exists($this, 'avatarManagerDriver')) {
+    public function avatarManagerDriver(): ?string {
+        if ( property_exists( $this, 'avatarManagerDriver' ) ) {
             return $this->avatarManagerDriver;
         }
 
@@ -87,9 +87,8 @@ trait HasAvatar
      *
      * @return string
      */
-    public function avatarKey(): string
-    {
-        if (property_exists($this, 'avatarKey')) {
+    public function avatarKey(): string {
+        if ( property_exists( $this, 'avatarKey' ) ) {
             return $this->avatarKey;
         }
 
@@ -101,9 +100,8 @@ trait HasAvatar
      *
      * @return \SimpleImageManager\Contracts\ImageManagerInterface
      */
-    public function avatarManager(): \SimpleImageManager\Contracts\ImageManagerInterface
-    {
-        return SimpleImageManager::driver($this->avatarManagerDriver());
+    public function avatarManager(): \SimpleImageManager\Contracts\ImageManagerInterface {
+        return SimpleImageManager::driver( $this->avatarManagerDriver() );
     }
 
     /**
@@ -114,10 +112,26 @@ trait HasAvatar
      *
      * @return string|null Storage file name.
      */
-    public function avatarUpload(UploadedFile $image, ?string $filename): ?string
-    {
+    public function avatarUpload( UploadedFile $image, ?string $filename = null ): ?string {
         return $this->avatarManager()
-            ->upload($image, $filename, $this->{$this->avatarKey()});
+                    ->upload( $image, $filename, $this->{$this->avatarKey()} );
+    }
+
+    /**
+     * Delete file from storage.
+     *
+     * @return bool Storage file name.
+     */
+    public function avatarDelete( bool $updateField = true, bool $persist = false ): bool {
+        $result = $this->avatarManager()->delete( $this->{$this->avatarKey()} );
+        if ( $result && $updateField ) {
+            $this->{$this->avatarKey()} = null;
+            if ( $persist ) {
+                $this->save();
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -127,9 +141,8 @@ trait HasAvatar
      *
      * @return string|null
      */
-    public function avatarPath(?string $format): ?string
-    {
-        return $this->avatarManager()->path((string) $this->{$this->avatarKey()}, $format);
+    public function avatarPath( ?string $format = null ): ?string {
+        return $this->avatarManager()->path( (string) $this->{$this->avatarKey()}, $format );
     }
 
     /**
@@ -139,9 +152,8 @@ trait HasAvatar
      *
      * @return string|null
      */
-    public function avatarUrl(?string $format): ?string
-    {
-        return $this->avatarManager()->url((string) $this->{$this->avatarKey()}, $format);
+    public function avatarUrl( ?string $format = null ): ?string {
+        return $this->avatarManager()->url( (string) $this->{$this->avatarKey()}, $format );
     }
 }
 ```
@@ -155,7 +167,7 @@ class User //...
     use HasAvatar;
     // ...
 
-    protected $avatarManagerDriver = 'avatars';
+    protected sting $avatarManagerDriver = 'avatars';
 }
 ```
 
@@ -172,6 +184,22 @@ $user->save();
 
 
 $url = $user->avatarUrl();
+```
+
+4. Usage with laravel-nova
+
+```injectablephp
+Avatar::make( 'Avatar' )
+    ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
+      return $model->avatarUpload( $request->file( $requestAttribute ),  /* second parameter can be something like "{$model->getKey()}-" . \Str::uuid() */ );
+    } )
+    ->maxWidth( 100 )
+    ->preview( function ( $value, $storageDisk, $model ) {
+      return $model->avatarUrl( 'small' );
+    } )
+    ->delete( function ( $request, $model, $storageDisk, $storagePath ) {
+      $model->avatarDelete();
+    } ),
 ```
 
 ## Credits

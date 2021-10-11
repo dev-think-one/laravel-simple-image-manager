@@ -34,6 +34,11 @@ abstract class AbstractImageManager implements ImageManagerInterface
      */
     public array $deletedFormats = [];
 
+    /**
+     * @var array
+     */
+    public array $immutableExtensions = [];
+
 
     public function __construct(array $configs)
     {
@@ -61,6 +66,10 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
         if (!empty($configs['prefix']) && is_string($configs['prefix'])) {
             $this->prefix = $configs['prefix'];
+        }
+
+        if (!empty($configs['immutable_extensions']) && is_array($configs['immutable_extensions'])) {
+            $this->immutableExtensions = $configs['immutable_extensions'];
         }
     }
 
@@ -97,7 +106,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
             $fileName,
         ];
 
-        list($name, $extension) = $this->explodeFilename($fileName);
+        [ $name, $extension ] = $this->explodeFilename($fileName);
 
         foreach (array_keys($this->formats) as $format) {
             $filesToDelete[] = "{$name}-{$format}.{$extension}";
@@ -119,13 +128,13 @@ abstract class AbstractImageManager implements ImageManagerInterface
             return false;
         }
         if ($format) {
-            list($name, $extension) = $this->explodeFilename($fileName);
+            [ $name, $extension ] = $this->explodeFilename($fileName);
 
             $fileName = "{$name}-{$format}.{$extension}";
         }
 
 
-        return  $this->storage()->delete($fileName);
+        return $this->storage()->delete($fileName);
     }
 
     /**
@@ -137,7 +146,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
             return null;
         }
         if ($format) {
-            list($name, $extension) = $this->explodeFilename($fileName);
+            [ $name, $extension ] = $this->explodeFilename($fileName);
 
             $fileName = "{$name}-{$format}.{$extension}";
         }
@@ -154,7 +163,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
             return null;
         }
         if ($format) {
-            list($name, $extension) = $this->explodeFilename($fileName);
+            [ $name, $extension ] = $this->explodeFilename($fileName);
 
             $fileName = "{$name}-{$format}.{$extension}";
         }
@@ -164,11 +173,11 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
     protected function explodeFilename(string $fileName)
     {
-        $extension     = pathinfo($fileName, PATHINFO_EXTENSION);
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
 
         $name = Str::beforeLast($fileName, ".{$extension}");
 
-        return [$name, $extension];
+        return [ $name, $extension ];
     }
 
     protected function storage()
@@ -188,7 +197,8 @@ abstract class AbstractImageManager implements ImageManagerInterface
     protected function createOriginalFile(UploadedFile $image, string $newFileName, string $newFileExt)
     {
         $builder = Image::load($image->path());
-        if (is_array($this->original) &&
+        if (!in_array($newFileExt, $this->immutableExtensions) &&
+             is_array($this->original) &&
              !empty($this->original['methods'])
         ) {
             foreach ($this->original['methods'] as $method => $attrs) {
@@ -204,7 +214,8 @@ abstract class AbstractImageManager implements ImageManagerInterface
         foreach ($this->formats as $format => $configuration) {
             $formatPath = $this->storage()->path("{$newFileName}-{$format}{$newFileExt}");
             $builder    = Image::load($image->path());
-            if (!empty($configuration['methods']) && is_array($configuration['methods'])) {
+            if (!in_array($newFileExt, $this->immutableExtensions) &&
+                 !empty($configuration['methods']) && is_array($configuration['methods'])) {
                 foreach ($configuration['methods'] as $method => $attrs) {
                     call_user_func_array([ $builder, $method ], $attrs);
                 }
