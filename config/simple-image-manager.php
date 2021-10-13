@@ -41,47 +41,52 @@ return [
 
     'drivers' => [
         'avatars'        => [
-            'disk'           => 'avatars',
+            'disk'                 => 'avatars',
             # 'prefix'         => 'some-folder/',
-            'immutable_extensions' => ['.svg'],
+            'immutable_extensions' => [ '.svg' ],
             'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 500, 500 ],
                     'optimize' => [],
                 ],
+                'srcset'  => '500w',
             ],
-            'deletedFormats' => [],
-            'formats'        => [
+            'deletedFormats'       => [],
+            'formats'              => [
                 'medium' => [
                     'methods' => [
                         'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 250, 250 ],
                         'optimize' => [],
                     ],
+                    'srcset'  => '250w',
                 ],
                 'small'  => [
                     'methods' => [
                         'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 100, 100 ],
                         'optimize' => [],
                     ],
+                    'srcset'  => '100w',
                 ],
             ],
         ],
         'feature-images' => [
             'disk'                 => 'feature-images',
-            'immutable_extensions' => ['.svg'],
+            'immutable_extensions' => [ '.svg' ],
             'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 2800, 1800 ],
                     'optimize' => [],
                 ],
+                'srcset'  => '2800w',
             ],
-            'deletedFormats' => [],
-            'formats'        => [
+            'deletedFormats'       => [],
+            'formats'              => [
                 'thumb' => [
                     'methods' => [
                         'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 450, 300 ],
                         'optimize' => [],
                     ],
+                    'srcset'  => '450w',
                 ],
             ],
         ],

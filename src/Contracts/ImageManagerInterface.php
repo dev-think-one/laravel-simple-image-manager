@@ -51,4 +51,11 @@ interface ImageManagerInterface
      * @return string|null
      */
     public function url(string $fileName, ?string $format): ?string;
+
+    /**
+     * Array map of srcset
+     *
+     * @return array
+     */
+    public function srcsetMap(): array;
 }

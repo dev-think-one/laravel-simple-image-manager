@@ -58,6 +58,8 @@ if($isDeletedAll = SimpleImageManager::driver('avatars')->delete((string) $user-
 
 ### Advanced usage
 
+#### Create specific trait
+
 1. Create trait
 
 ```injectablephp
@@ -186,12 +188,51 @@ $user->save();
 $url = $user->avatarUrl();
 ```
 
-4. Usage with laravel-nova
+#### Use internal trait
+
+```injectablephp
+use Illuminate\Database\Eloquent\Model;
+use \SimpleImageManager\Eloquent\HasThinkImage;
+use \SimpleImageManager\Eloquent\ThinkImage;
+
+class Author extends Model
+{
+    use HasThinkImage;
+
+    /** @inerhitDoc  */
+    public function thinkImagesMap(): array {
+        return [
+            'avatar' => (new ThinkImage('avatar', $this->avatar))
+                ->setDefaultUrl(url('/img/default.svg')),
+            'image' => 'feature_image',
+        ];
+    }
+
+    public function avatarImage(): ThinkImage {
+        return $this->thinkImage('avatar');
+    }
+
+    public function featureImage(): ThinkImage {
+        return $this->thinkImage('image');
+    }
+}
+```
+
+Then you can use it:
+
+```injectablephp
+/** @var Author Author */
+$author->featureImage()->img();
+$author->avatarImage()->url();
+$author->thinkImage('avatar')->path();
+```
+
+#### Usage with laravel-nova
 
 ```injectablephp
 Avatar::make( 'Avatar' )
     ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
-      return $model->avatarUpload( $request->file( $requestAttribute ),  /* second parameter can be something like "{$model->getKey()}-" . \Str::uuid() */ );
+      return $model->avatarUpload( $request->file( $requestAttribute ),  /* second parameter can be something like \Str::uuid() */ );
     } )
     ->maxWidth( 100 )
     ->preview( fn ( $value, $storageDisk, $model ) => $model->avatarUrl( 'small' ))
@@ -199,6 +240,19 @@ Avatar::make( 'Avatar' )
     ->delete( function ( $request, $model, $storageDisk, $storagePath ) {
       $model->avatarDelete();
     } ),
+```
+
+Or you can use callback in case you need model ID
+
+```injectablephp
+Avatar::make( 'Feature image', 'image' )
+    ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
+        return function () use ($request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir) {
+            $model->avatarUpload( $request->file( $requestAttribute ),  "{$model->getKey()}/" . \Str::uuid() );
+            $model->save();
+        };
+    } )
+    // ...
 ```
 
 ## Credits

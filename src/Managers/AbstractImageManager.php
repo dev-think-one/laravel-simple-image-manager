@@ -171,6 +171,29 @@ abstract class AbstractImageManager implements ImageManagerInterface
         return $this->storage()->url($fileName);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function srcsetMap(): array
+    {
+        $map = [];
+
+        if (is_array($this->original) &&
+             !empty($this->original['srcset'])) {
+            $map[''] = $this->original['srcset'];
+        }
+
+        foreach ($this->formats as $format => $configuration) {
+            if (!empty($configuration['srcset'])) {
+                $map[ $format ] = $configuration['srcset'];
+            }
+        }
+
+        sort($map);
+
+        return $map;
+    }
+
     protected function explodeFilename(string $fileName)
     {
         $extension = pathinfo($fileName, PATHINFO_EXTENSION);

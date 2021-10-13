@@ -11,9 +11,16 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
                 __DIR__ . '/../config/simple-image-manager.php' => config_path('simple-image-manager.php'),
             ], 'config');
 
+            $this->publishes([
+                __DIR__ . '/../resources/views' => resource_path('views/vendor/simple-image-manager'),
+            ], 'views');
+
             $this->commands([
+                //
             ]);
         }
+
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'simple-image-manager');
     }
 
     public function register()
