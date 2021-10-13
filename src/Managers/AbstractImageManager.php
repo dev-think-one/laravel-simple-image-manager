@@ -252,7 +252,9 @@ abstract class AbstractImageManager implements ImageManagerInterface
             }
         }
 
-        sort($map);
+        uasort($map, function ($a, $b) {
+            return (int)$b - (int)$a;
+        });
 
         return $map;
     }

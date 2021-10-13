@@ -144,7 +144,7 @@ class ThinkImage
     {
         $attrs = collect($attrs);
 
-        if (!($src = $attrs->pull('src', $this->url(null, $defaultUrl)))) {
+        if (!($src = $attrs->pull('src', $this->url($attrs->pull('format'), $defaultUrl)))) {
             return '';
         }
 
