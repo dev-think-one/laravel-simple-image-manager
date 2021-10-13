@@ -237,13 +237,13 @@ $author->thinkImage('avatar')->path();
 ```injectablephp
 Avatar::make( 'Avatar' )
     ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
-      return $model->avatarUpload( $request->file( $requestAttribute ),  /* second parameter can be something like \Str::uuid() */ );
+      return $model->avatarImage()->upload( $request->file( $requestAttribute ),  /* second parameter can be something like \Str::uuid() */ );
     } )
     ->maxWidth( 100 )
-    ->preview( fn ( $value, $storageDisk, $model ) => $model->avatarUrl( 'small' ))
-    ->thumbnail( fn ( $value, $storageDisk, $model ) => $model->avatarUrl( 'small' ))
+    ->preview( fn ( $value, $storageDisk, $model ) => $model->avatarImage()->url( 'small' ))
+    ->thumbnail( fn ( $value, $storageDisk, $model ) => $model->avatarImage()->url( 'small' ))
     ->delete( function ( $request, $model, $storageDisk, $storagePath ) {
-      $model->avatarDelete();
+      $model->avatarImage()->delete();
     } ),
 ```
 
@@ -253,7 +253,7 @@ Or you can use callback in case you need model ID
 Avatar::make( 'Feature image', 'image' )
     ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
         return function () use ($request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir) {
-            $model->avatarUpload( $request->file( $requestAttribute ),  "{$model->getKey()}/" . \Str::uuid(), $model->$attribute );
+            $model->$attribute = $model->avatarImage()->upload($request->file($requestAttribute), "{$model->getKey()}-" . Str::uuid(), $model->$attribute);
             $model->save();
         };
     } )
