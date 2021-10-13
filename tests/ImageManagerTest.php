@@ -44,12 +44,12 @@ class ImageManagerTest extends TestCase
             ]
         ));
 
-        $file           = UploadedFile::fake()->image('avatar.jpg', 1700, 20);
+        $file           = UploadedFile::fake()->image('avatar.png', 1700, 20);
         $fileBaseName   = Str::uuid();
         $originFilePath = $manager->upload($file, $fileBaseName);
         Storage::disk('avatars')->assertExists($originFilePath);
 
-        $file2           = UploadedFile::fake()->image('avatar.jpg', 1700, 20);
+        $file2           = UploadedFile::fake()->image('avatar.png', 1700, 20);
         $file2BaseName   = Str::uuid();
         $originFile2Path = $manager->upload($file2, $file2BaseName, $originFilePath);
         Storage::disk('avatars')->assertExists($originFile2Path);
