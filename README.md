@@ -253,7 +253,7 @@ Or you can use callback in case you need model ID
 Avatar::make( 'Feature image', 'image' )
     ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
         return function () use ($request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir) {
-            $model->avatarUpload( $request->file( $requestAttribute ),  "{$model->getKey()}/" . \Str::uuid() );
+            $model->avatarUpload( $request->file( $requestAttribute ),  "{$model->getKey()}/" . \Str::uuid(), $model->$attribute );
             $model->save();
         };
     } )

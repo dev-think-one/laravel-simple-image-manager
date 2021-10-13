@@ -78,9 +78,9 @@ class ThinkImage
      *
      * @return string|null Storage file name.
      */
-    public function upload(UploadedFile $image, ?string $filename = null): ?string
+    public function upload(UploadedFile $image, ?string $filename = null, ?string $oldFile = null): ?string
     {
-        return $this->manager->upload($image, $filename);
+        return $this->manager->upload($image, $filename, $oldFile);
     }
 
     /**
