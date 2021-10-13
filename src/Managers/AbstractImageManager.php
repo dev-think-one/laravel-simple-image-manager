@@ -37,31 +37,103 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
     public function __construct(array $configs)
     {
-        if (empty($configs['disk']) || !is_string($configs['disk'])) {
+        $this->setDisk($configs['disk'] ?? null);
+
+        if (array_key_exists('original', $configs)) {
+            $this->setOriginal($configs['original']);
+        }
+
+        if (array_key_exists('formats', $configs)) {
+            $this->setFormats($configs['formats']);
+        }
+
+        if (array_key_exists('deletedFormats', $configs)) {
+            $this->setDeletedFormats($configs['deletedFormats']);
+        }
+
+        if (array_key_exists('prefix', $configs)) {
+            $this->setPrefix($configs['prefix']);
+        }
+
+        if (array_key_exists('immutable_extensions', $configs)) {
+            $this->setImmutableExtensions($configs['immutable_extensions']);
+        }
+    }
+
+    /**
+     * @param string|null $disk
+     *
+     * @return $this
+     */
+    public function setDisk(?string $disk = null): static
+    {
+        if (empty($disk) || !is_string($disk)) {
             throw new \InvalidArgumentException("Driver configuration has not key 'disk'");
         }
 
-        $this->disk = $configs['disk'];
+        $this->disk = $disk;
 
-        if (isset($configs['original']) && (is_array($configs['original']) || is_bool($configs['original']))) {
-            $this->original = $configs['original'];
-        }
+        return $this;
+    }
 
-        if (isset($configs['formats']) && is_array($configs['formats'])) {
-            $this->formats = $configs['formats'];
-        }
+    /**
+     * @param bool|array $original
+     *
+     * @return $this
+     */
+    public function setOriginal(bool|array $original = false): static
+    {
+        $this->original = $original;
 
-        if (isset($configs['deletedFormats']) && is_array($configs['deletedFormats'])) {
-            $this->deletedFormats = $configs['deletedFormats'];
-        }
+        return $this;
+    }
 
-        if (!empty($configs['prefix']) && is_string($configs['prefix'])) {
-            $this->prefix = $configs['prefix'];
-        }
+    /**
+     * @param array $formats
+     *
+     * @return $this
+     */
+    public function setFormats(array $formats): static
+    {
+        $this->formats = $formats;
 
-        if (!empty($configs['immutable_extensions']) && is_array($configs['immutable_extensions'])) {
-            $this->immutableExtensions = $configs['immutable_extensions'];
-        }
+        return $this;
+    }
+
+    /**
+     * @param array $formats
+     *
+     * @return $this
+     */
+    public function setDeletedFormats(array $formats = []): static
+    {
+        $this->deletedFormats = $formats;
+
+        return $this;
+    }
+
+    /**
+     * @param array $immutableExtensions
+     *
+     * @return $this
+     */
+    public function setImmutableExtensions(array $immutableExtensions = []): static
+    {
+        $this->immutableExtensions = $immutableExtensions;
+
+        return $this;
+    }
+
+    /**
+     * @param string $prefix
+     *
+     * @return $this
+     */
+    public function setPrefix(string $prefix = ''): static
+    {
+        $this->prefix = $prefix;
+
+        return $this;
     }
 
     public function upload(UploadedFile $image, ?string $fileName = null, ?string $oldFile = null): string
