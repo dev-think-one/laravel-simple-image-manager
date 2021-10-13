@@ -42,7 +42,7 @@ interface ImageManagerInterface
      *
      * @return string|null
      */
-    public function path(string $fileName, ?string $format): ?string;
+    public function path(string $fileName, ?string $format = null): ?string;
 
     /**
      * @param string $fileName
@@ -50,7 +50,7 @@ interface ImageManagerInterface
      *
      * @return string|null
      */
-    public function url(string $fileName, ?string $format): ?string;
+    public function url(string $fileName, ?string $format = null): ?string;
 
     /**
      * Array map of srcset

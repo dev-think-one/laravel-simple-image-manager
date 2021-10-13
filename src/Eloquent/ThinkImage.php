@@ -108,7 +108,7 @@ class ThinkImage
     public function path(?string $format = null, ?string $default = null): ?string
     {
         if (!$this->value) {
-            return $default;
+            return $default ?? $this->defaultPath;
         }
 
         return $this->manager->path($this->value, $format) ?? ($default ?? $this->defaultPath);
@@ -124,6 +124,10 @@ class ThinkImage
      */
     public function url(?string $format = null, ?string $default = null): ?string
     {
+        if (!$this->value) {
+            return $default ?? $this->defaultUrl;
+        }
+
         return $this->manager->url((string) $this->value, $format) ?? ($default ?? $this->defaultUrl);
     }
 
@@ -157,5 +161,20 @@ class ThinkImage
         $attributes = $attrs->map(fn ($i, $key) => "$key='{$i}'")->implode(' ');
 
         return View::make('simple-image-manager::blocks.think-image', compact('lazy', 'attributes', 'defaultSrc', 'src', 'srcset', 'class'))->render();
+    }
+
+    /**
+     * Propagate call.
+     *
+     * @param string $method
+     * @param array $attributes
+     */
+    public function __call($method, $attributes)
+    {
+        if (method_exists($this->manager, $method)) {
+            return call_user_func_array([ $this->manager, $method ], $attributes);
+        }
+
+        throw new \BadMethodCallException("Method [{$method} not exists]");
     }
 }

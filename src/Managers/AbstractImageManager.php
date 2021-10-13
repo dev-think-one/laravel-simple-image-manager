@@ -20,11 +20,6 @@ abstract class AbstractImageManager implements ImageManagerInterface
     public $original = false;
 
     /**
-     * @var bool|array
-     */
-    public $responsive = false;
-
-    /**
      * @var array
      */
     public array $formats = [];
@@ -50,10 +45,6 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
         if (isset($configs['original']) && (is_array($configs['original']) || is_bool($configs['original']))) {
             $this->original = $configs['original'];
-        }
-
-        if (isset($configs['responsive']) && (is_array($configs['responsive']) || is_bool($configs['responsive']))) {
-            $this->responsive = $configs['responsive'];
         }
 
         if (isset($configs['formats']) && is_array($configs['formats'])) {
@@ -140,7 +131,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     /**
      * @inheritDoc
      */
-    public function path(string $fileName, ?string $format): ?string
+    public function path(string $fileName, ?string $format = null): ?string
     {
         if (!$fileName) {
             return null;
@@ -157,7 +148,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     /**
      * @inheritDoc
      */
-    public function url(string $fileName, ?string $format): ?string
+    public function url(string $fileName, ?string $format = null): ?string
     {
         if (!$fileName) {
             return null;
@@ -203,11 +194,19 @@ abstract class AbstractImageManager implements ImageManagerInterface
         return [ $name, $extension ];
     }
 
-    protected function storage()
+    /**
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function storage(): \Illuminate\Contracts\Filesystem\Filesystem
     {
         return Storage::disk($this->disk);
     }
 
+    /**
+     * @param string|null $fileName
+     *
+     * @return string
+     */
     protected function makeFileName(?string $fileName = null): string
     {
         if (!$fileName) {
