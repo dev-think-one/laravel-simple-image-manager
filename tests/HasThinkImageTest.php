@@ -67,7 +67,7 @@ class HasThinkImageTest extends TestCase
         $this->assertFalse($author->avatarImage()->delete());
         $this->assertInstanceOf(ThinkImage::class, $author->avatarImage());
 
-        $file         = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $file         = UploadedFile::fake()->image('avatar.png', 40, 20);
         $fileBaseName = Str::uuid();
 
         $originFilePath = $author->avatarImage()->upload($file, $fileBaseName);
@@ -105,7 +105,7 @@ class HasThinkImageTest extends TestCase
         /** @var Author $author */
         $author = Author::create();
 
-        $file         = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $file         = UploadedFile::fake()->image('avatar.png', 40, 20);
 
         $originFilePath = $author->avatarImage()->upload($file);
 
