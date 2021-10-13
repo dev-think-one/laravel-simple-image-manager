@@ -53,9 +53,9 @@ class HasThinkImageTest extends TestCase
         $this->assertStringContainsString('<img', $author->avatarImage()->img());
         $this->assertEmpty($author->avatarImage()->setDefaultUrl(null)->img());
 
-        $author->avatar = 'my-file.jpg';
-        $this->assertTrue(Str::endsWith($author->avatarImage()->path(), '/my-file.jpg'));
-        $this->assertTrue(Str::endsWith($author->avatarImage()->url(), '/my-file.jpg'));
+        $author->avatar = 'my-file.png';
+        $this->assertTrue(Str::endsWith($author->avatarImage()->path(), '/my-file.png'));
+        $this->assertTrue(Str::endsWith($author->avatarImage()->url(), '/my-file.png'));
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class HasThinkImageTest extends TestCase
         $this->assertFalse($author->avatarImage()->delete());
         $this->assertInstanceOf(ThinkImage::class, $author->avatarImage());
 
-        $file         = UploadedFile::fake()->image('avatar.jpg', 1700, 20);
+        $file         = UploadedFile::fake()->image('avatar.png', 1700, 20);
         $fileBaseName = Str::uuid();
 
         $originFilePath = $author->avatarImage()->upload($file, $fileBaseName);
@@ -90,8 +90,8 @@ class HasThinkImageTest extends TestCase
         $this->assertTrue(file_exists($author->avatarImage()->path()));
         $this->assertTrue(file_exists($author->avatarImage()->path('small')));
         $this->assertTrue(file_exists($author->avatarImage()->path('medium')));
-        $this->assertTrue(Str::endsWith($author->avatarImage()->path('small'), "{$fileBaseName}-small.jpg"));
-        $this->assertTrue(Str::endsWith($author->avatarImage()->url('medium'), "{$fileBaseName}-medium.jpg"));
+        $this->assertTrue(Str::endsWith($author->avatarImage()->path('small'), "{$fileBaseName}-small.png"));
+        $this->assertTrue(Str::endsWith($author->avatarImage()->url('medium'), "{$fileBaseName}-medium.png"));
 
         $author->avatarImage()->delete();
         $this->assertFalse(file_exists($author->avatarImage()->path()));
@@ -105,7 +105,7 @@ class HasThinkImageTest extends TestCase
         /** @var Author $author */
         $author = Author::create();
 
-        $file         = UploadedFile::fake()->image('avatar.jpg', 1700, 20);
+        $file         = UploadedFile::fake()->image('avatar.png', 1700, 20);
 
         $originFilePath = $author->avatarImage()->upload($file);
 
