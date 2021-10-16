@@ -71,10 +71,23 @@ class ThinkImage
     }
 
     /**
+     * Check is file exists.
+     *
+     * @param string|null $format
+     *
+     * @return bool
+     */
+    public function exists(?string $format = null): bool
+    {
+        return file_exists($this->path($format));
+    }
+
+    /**
      * Upload file to storage.
      *
      * @param UploadedFile $image
      * @param string|null $filename
+     * @param string|null $oldFile
      *
      * @return string|null Storage file name.
      */

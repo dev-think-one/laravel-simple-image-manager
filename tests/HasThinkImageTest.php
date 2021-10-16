@@ -100,12 +100,12 @@ class HasThinkImageTest extends TestCase
     }
 
     /** @test */
-    public function author_can_upload_iamge_without_name()
+    public function author_can_upload_image_without_name()
     {
         /** @var Author $author */
         $author = Author::create();
 
-        $file         = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $file = UploadedFile::fake()->image('avatar.png', 1700, 20);
 
         $originFilePath = $author->avatarImage()->upload($file);
 
@@ -113,5 +113,27 @@ class HasThinkImageTest extends TestCase
         $this->assertNotEmpty($originFilePath);
         Storage::disk('avatars')->assertExists($originFilePath);
         $this->assertTrue(file_exists($author->avatarImage()->storage()->path($originFilePath)));
+    }
+
+    /** @test */
+    public function file_esists()
+    {
+        /** @var Author $author */
+        $author = Author::create();
+
+        $file = UploadedFile::fake()->image('avatar.png', 1700, 20);
+
+        $author->avatar = $author->avatarImage()->upload($file);
+
+        $this->assertNotEmpty($author->avatar);
+        clearstatcache();
+        Storage::disk('avatars')->assertExists($author->avatar);
+        clearstatcache();
+        $this->assertTrue($author->avatarImage()->exists());
+        Storage::disk('avatars')->delete($author->avatar);
+        clearstatcache();
+        Storage::disk('avatars')->assertMissing($author->avatar);
+        clearstatcache();
+        $this->assertFalse($author->avatarImage()->exists());
     }
 }
