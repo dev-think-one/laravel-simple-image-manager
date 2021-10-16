@@ -79,7 +79,7 @@ class ThinkImage
      */
     public function exists(?string $format = null): bool
     {
-        return file_exists($this->path($format));
+        return (($path = $this->path($format))) && file_exists($path);
     }
 
     /**
