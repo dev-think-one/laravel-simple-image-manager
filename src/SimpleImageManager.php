@@ -11,6 +11,13 @@ class SimpleImageManager
 {
 
     /**
+     * Configuration filtration callback.
+     *
+     * @var \Closure|null
+     */
+    protected static ?\Closure $filterConfigCallback = null;
+
+    /**
      * The application instance.
      */
     protected Application $app;
@@ -30,14 +37,51 @@ class SimpleImageManager
         $this->app = $app;
     }
 
-    public function getDefaultDriver()
+    /**
+     * Add additional filter for config data. Can be user in app service provider.
+     *
+     * @param \Closure|null $callback
+     */
+    public static function filterConfigUsing(?\Closure $callback): void
+    {
+        static::$filterConfigCallback = $callback;
+    }
+
+    /**
+     * Get default driver name.
+     *
+     * @return string
+     */
+    public function getDefaultDriver(): string
     {
         return $this->app->get('config')['simple-image-manager.default.driver'];
     }
 
-    protected function getConfig(string $name)
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    protected function getConfig(string $name): mixed
     {
-        return $this->app->get('config')["simple-image-manager.drivers.{$name}"] ?? null;
+        $configData = $this->app->get('config')["simple-image-manager.drivers.{$name}"] ?? null;
+
+        return $this->filterConfig($name, $configData);
+    }
+
+    /**
+     * @param string $driver
+     * @param mixed $config
+     *
+     * @return mixed
+     */
+    protected function filterConfig(string $driver, mixed $config): mixed
+    {
+        if (is_callable(static::$filterConfigCallback)) {
+            return call_user_func(static::$filterConfigCallback, $driver, $config);
+        }
+
+        return $config;
     }
 
     /**
@@ -80,8 +124,8 @@ class SimpleImageManager
         if (!empty($config['manager'])) {
             $manager = $config['manager'];
             if (is_string($manager) &&
-                class_exists($manager) &&
-                is_subclass_of($manager, ImageManagerInterface::class)) {
+                 class_exists($manager) &&
+                 is_subclass_of($manager, ImageManagerInterface::class)) {
                 return new $manager($config);
             }
 
