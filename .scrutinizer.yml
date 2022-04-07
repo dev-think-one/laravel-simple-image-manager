@@ -5,6 +5,7 @@ build:
   nodes:
     analysis:
       environment:
+        image: default-bionic
         php:
           version: 8.1
           ini:
