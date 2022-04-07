@@ -4,8 +4,8 @@ filter:
 build:
   nodes:
     analysis:
+      image: default-bionic
       environment:
-        image: default-bionic
         php:
           version: 8.1
           ini:
