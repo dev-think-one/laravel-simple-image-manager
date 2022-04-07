@@ -36,16 +36,16 @@ php artisan vendor:publish --provider="SimpleImageManager\ServiceProvider" --tag
 
 Upload file example:
 
-```injectablephp
+```php
 if ($request->hasFile('avatar')) {
-            $user->avatar = SimpleImageManager::driver('avatars')
-                                              ->upload(
-                                              $request->file('avatar'), 
-                                              null /* or some name */,
-                                               $user->avatar /* old file name to replace it */
-                                               );
+    $user->avatar = SimpleImageManager::driver('avatars')
+                                      ->upload(
+                                          $request->file('avatar'), 
+                                          null /* or some name */,
+                                          $user->avatar /* old file name to replace it */
+                                       );
 }
- $user->save();
+$user->save();
 ```
 
 Other methods:
@@ -169,7 +169,7 @@ trait HasAvatar {
 
 2. Use trail
 
-```injectablephp
+```php
 class User //...
 {
     //...
@@ -182,7 +182,7 @@ class User //...
 
 3. Manipulate using trait
 
-```injectablephp
+```php
 if ($request->hasFile('avatar')) {
             $user->avatar = $user->avatarUpload(
                     $request->file('avatar'), 
@@ -197,7 +197,7 @@ $url = $user->avatarUrl();
 
 #### Use internal trait
 
-```injectablephp
+```php
 use Illuminate\Database\Eloquent\Model;
 use \SimpleImageManager\Eloquent\HasThinkImage;
 use \SimpleImageManager\Eloquent\ThinkImage;
@@ -227,7 +227,7 @@ class Author extends Model
 
 Then you can use it:
 
-```injectablephp
+```php
 /** @var Author Author */
 $author->featureImage()->img();
 $author->avatarImage()->url();
@@ -236,30 +236,16 @@ $author->thinkImage('avatar')->path();
 
 #### Usage with laravel-nova
 
-```injectablephp
-Avatar::make( 'Avatar' )
-    ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
-      return $model->avatarImage()->upload( $request->file( $requestAttribute ),  /* second parameter can be something like \Str::uuid() */ );
-    } )
-    ->maxWidth( 100 )
-    ->preview( fn ( $value, $storageDisk, $model ) => $model->avatarImage()->url( 'small' ))
-    ->thumbnail( fn ( $value, $storageDisk, $model ) => $model->avatarImage()->url( 'small' ))
-    ->delete( function ( $request, $model, $storageDisk, $storagePath ) {
-      $model->avatarImage()->delete();
-    } ),
-```
-
-Or you can use callback in case you need model ID
-
-```injectablephp
-Avatar::make( 'Feature image', 'image' )
-    ->store( function ( $request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir ) {
-        return function () use ($request, $model, $attribute, $requestAttribute, $storageDisk, $storageDir) {
-            $model->$attribute = $model->avatarImage()->upload($request->file($requestAttribute), "{$model->getKey()}-" . Str::uuid(), $model->$attribute);
-            $model->save();
-        };
-    } )
-    // ...
+```php
+Avatar::make('Avatar', 'avatar')
+    ->store(
+      fn ($request, Model $model, $attribute, $requestAttribute, $storageDisk, $storageDir) => fn () => $model->fill([
+          $attribute => $model->avatarUpload($request->file($requestAttribute), $model->uuid),
+      ])->save()
+    )->maxWidth(100)
+    ->preview(fn ($value, $storageDisk, $model) => $model->avatarUrl('small'))
+    ->thumbnail(fn ($value, $storageDisk, $model) => $model->avatarUrl('small'))
+    ->delete(fn ($request, $model, $storageDisk, $storagePath) => $model->avatarDelete()),
 ```
 
 ## Credits
