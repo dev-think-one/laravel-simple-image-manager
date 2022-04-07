@@ -143,7 +143,10 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
 
         $newFileName = $this->makeFileName($fileName);
-        $this->storage()->createDir(dirname($newFileName));
+
+        $tmpFile = rtrim(dirname($newFileName), '/') . '/.tmp';
+        $this->storage()->put($tmpFile, '');
+        $this->storage()->delete($tmpFile);
 
         $newFileExt = '.' . $image->extension();
 
