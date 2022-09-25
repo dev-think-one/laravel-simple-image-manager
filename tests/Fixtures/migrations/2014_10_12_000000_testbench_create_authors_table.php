@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 class TestbenchCreateAuthorsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *

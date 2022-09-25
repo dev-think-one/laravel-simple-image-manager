@@ -50,7 +50,7 @@ $user->save();
 
 Other methods:
 
-```injectablephp
+```php
 // Get file url
 $url = SimpleImageManager::driver('avatars')->url((string) $user->avatar, $format);
 // Get file path
@@ -69,7 +69,7 @@ if($isDeletedAll = SimpleImageManager::driver('avatars')->delete((string) $user-
 
 1. Create trait
 
-```injectablephp
+```php
 // app/Models/Traits/HasAvatar.php
 namespace App\Models\Traits;
 

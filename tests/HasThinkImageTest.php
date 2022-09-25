@@ -11,7 +11,6 @@ use SimpleImageManager\Tests\Fixtures\Models\Author;
 
 class HasThinkImageTest extends TestCase
 {
-
     /** @test */
     public function think_image_can_propagate_call()
     {

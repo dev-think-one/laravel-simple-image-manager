@@ -12,7 +12,6 @@ use SimpleImageManager\Tests\Fixtures\Managers\WrongCustomImageManager;
 
 class DriverManagerTest extends TestCase
 {
-
     /** @test */
     public function get_default_driver()
     {

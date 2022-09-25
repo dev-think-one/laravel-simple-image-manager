@@ -6,7 +6,6 @@ use SimpleImageManager\Exceptions\SimpleImageManagerException;
 
 trait HasThinkImage
 {
-
     /**
      * Resolved images.
      *

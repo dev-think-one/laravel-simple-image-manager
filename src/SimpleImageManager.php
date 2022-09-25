@@ -9,7 +9,6 @@ use SimpleImageManager\Managers\ImageManager;
 
 class SimpleImageManager
 {
-
     /**
      * Configuration filtration callback.
      *
@@ -123,7 +122,7 @@ class SimpleImageManager
 
         if (!empty($config['manager'])) {
             $manager = $config['manager'];
-            if (is_string($manager) &&
+            if (is_string($manager)     &&
                  class_exists($manager) &&
                  is_subclass_of($manager, ImageManagerInterface::class)) {
                 return new $manager($config);

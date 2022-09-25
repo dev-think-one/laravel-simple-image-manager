@@ -11,7 +11,6 @@ use SimpleImageManager\Managers\ImageManager;
 
 class ImageManagerTest extends TestCase
 {
-
     /** @test */
     public function if_empty_path_then_return_null()
     {

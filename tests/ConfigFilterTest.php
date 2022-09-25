@@ -7,8 +7,6 @@ use SimpleImageManager\Managers\ImageManager;
 
 class ConfigFilterTest extends TestCase
 {
-
-
     /** @test */
     public function constructor_should_have_disk()
     {
