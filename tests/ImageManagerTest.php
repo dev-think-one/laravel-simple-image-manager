@@ -73,4 +73,32 @@ class ImageManagerTest extends TestCase
         $this->assertFalse(file_exists($manager->path($originFile2Path, 'small')));
         $this->assertFalse(file_exists($manager->path($originFile2Path, 'medium')));
     }
+
+    /** @test */
+    public function upload_immutable_extension()
+    {
+        $manager = new ImageManager(array_merge(
+            Config::get('simple-image-manager.drivers.avatars'),
+            [
+                'prefix'         => 'my-pref',
+                'deletedFormats' => [
+                    'mini',
+                    'bigger',
+                ],
+            ]
+        ));
+
+        $file           = UploadedFile::fake()->image('avatar.gif', 1700, 20);
+        $fileBaseName   = Str::uuid();
+        $originFilePath = $manager->upload($file, $fileBaseName);
+        Storage::disk('avatars')->assertExists($originFilePath);
+        $this->assertTrue(file_exists($manager->path($originFilePath)));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath, 'small'));
+        $this->assertTrue(file_exists($manager->path($originFilePath, 'small')));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath, 'medium'));
+        $this->assertTrue(file_exists($manager->path($originFilePath, 'medium')));
+
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath, 'small'));
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath, 'medium'));
+    }
 }

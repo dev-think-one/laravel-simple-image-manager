@@ -43,7 +43,7 @@ return [
         'avatars'        => [
             'disk'                 => 'avatars',
             # 'prefix'         => 'some-folder/',
-            'immutable_extensions' => [ '.svg' ],
+            'immutable_extensions' => [ '.svg', '.gif' ],
             'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 500, 500 ],
@@ -71,7 +71,7 @@ return [
         ],
         'feature-images' => [
             'disk'                 => 'feature-images',
-            'immutable_extensions' => [ '.svg' ],
+            'immutable_extensions' => [ '.svg', '.gif' ],
             'original'             => [
                 'methods' => [
                     'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 2800, 1800 ],

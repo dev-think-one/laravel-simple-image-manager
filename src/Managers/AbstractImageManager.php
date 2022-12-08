@@ -216,8 +216,9 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
         if ($format) {
             [$name, $extension] = $this->explodeFilename($fileName);
-
-            $fileName = "{$name}-{$format}.{$extension}";
+            if (!in_array(".{$extension}", $this->immutableExtensions)) {
+                $fileName = "{$name}-{$format}.{$extension}";
+            }
         }
 
         return $this->storage()->path($fileName);
@@ -233,8 +234,9 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
         if ($format) {
             [$name, $extension] = $this->explodeFilename($fileName);
-
-            $fileName = "{$name}-{$format}.{$extension}";
+            if (!in_array(".{$extension}", $this->immutableExtensions)) {
+                $fileName = "{$name}-{$format}.{$extension}";
+            }
         }
 
         return $this->storage()->url($fileName);
@@ -298,31 +300,37 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
     protected function createOriginalFile(UploadedFile $image, string $newFileName, string $newFileExt)
     {
-        $builder = Image::load($image->path());
-        if (!in_array($newFileExt, $this->immutableExtensions) &&
-            is_array($this->original)                          &&
-            !empty($this->original['methods'])
-        ) {
-            foreach ($this->original['methods'] as $method => $attrs) {
-                call_user_func_array([$builder, $method], $attrs);
+        $path = "{$newFileName}{$newFileExt}";
+        if (!in_array($newFileExt, $this->immutableExtensions)) {
+            $builder = Image::load($image->path());
+            if (is_array($this->original) &&
+                !empty($this->original['methods'])
+            ) {
+                foreach ($this->original['methods'] as $method => $attrs) {
+                    call_user_func_array([$builder, $method], $attrs);
+                }
             }
-        }
 
-        $builder->save($this->storage()->path("{$newFileName}{$newFileExt}"));
+            $builder->save($this->storage()->path($path));
+        } else {
+            $this->storage()->put($path, $image->getContent());
+        }
     }
 
     protected function createFormats(UploadedFile $image, string $newFileName, string $newFileExt)
     {
-        foreach ($this->formats as $format => $configuration) {
-            $formatPath = $this->storage()->path("{$newFileName}-{$format}{$newFileExt}");
-            $builder    = Image::load($image->path());
-            if (!in_array($newFileExt, $this->immutableExtensions) &&
-                !empty($configuration['methods'])                  && is_array($configuration['methods'])) {
-                foreach ($configuration['methods'] as $method => $attrs) {
-                    call_user_func_array([$builder, $method], $attrs);
+        if (!in_array($newFileExt, $this->immutableExtensions)) {
+            foreach ($this->formats as $format => $configuration) {
+                $path = "{$newFileName}-{$format}{$newFileExt}";
+
+                $builder = Image::load($image->path());
+                if (!empty($configuration['methods']) && is_array($configuration['methods'])) {
+                    foreach ($configuration['methods'] as $method => $attrs) {
+                        call_user_func_array([$builder, $method], $attrs);
+                    }
                 }
+                $builder->save($this->storage()->path($path));
             }
-            $builder->save($formatPath);
         }
     }
 }
