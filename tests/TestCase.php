@@ -10,6 +10,9 @@ class TestCase extends Orchestra
 {
     public function setUp(): void
     {
+        // fix resize big image test
+        ini_set('memory_limit', '-1');
+
         parent::setUp();
         Storage::fake('avatars');
         Storage::fake('feature-images');
