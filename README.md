@@ -176,7 +176,7 @@ class User //...
     use HasAvatar;
     // ...
 
-    protected sting $avatarManagerDriver = 'avatars';
+    protected string $avatarManagerDriver = 'avatars';
 }
 ```
 
