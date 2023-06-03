@@ -175,6 +175,8 @@ abstract class AbstractImageManager implements ImageManagerInterface
             $fileName,
         ];
 
+        $directoryName = dirname($fileName);
+
         [$name, $extension] = $this->explodeFilename($fileName);
 
         foreach (array_keys($this->formats) as $format) {
@@ -185,7 +187,13 @@ abstract class AbstractImageManager implements ImageManagerInterface
             $filesToDelete[] = "{$name}-{$format}.{$extension}";
         }
 
-        return $this->storage()->delete(array_unique($filesToDelete));
+        $isDeleted = $this->storage()->delete(array_unique($filesToDelete));
+
+        if (empty($this->storage()->files($directoryName))) {
+            $this->storage()->deleteDirectory($directoryName);
+        }
+
+        return $isDeleted;
     }
 
     /**
