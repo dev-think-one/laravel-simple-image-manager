@@ -190,7 +190,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
         $isDeleted = $this->storage()->delete(array_unique($filesToDelete));
 
         if (empty($this->storage()->files($directoryName))) {
-            $this->storage()->deleteDirectory($directoryName);
+            // $this->storage()->deleteDirectory($directoryName);
         }
 
         return $isDeleted;
