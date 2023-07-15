@@ -101,4 +101,163 @@ class ImageManagerTest extends TestCase
         $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath, 'small'));
         $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath, 'medium'));
     }
+
+    /** @test */
+    public function delete_also_empty_directory()
+    {
+        $manager = new ImageManager(array_merge(
+            Config::get('simple-image-manager.drivers.avatars'),
+            [
+                'prefix'         => null,
+                'truncateDir'    => true,
+                'deletedFormats' => [
+                    'mini',
+                    'bigger',
+                ],
+            ]
+        ));
+
+        $file           = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $directoryName  = 'fooBar';
+        $fileBaseName   = $directoryName . DIRECTORY_SEPARATOR . Str::uuid();
+        $originFilePath = $manager->upload($file, $fileBaseName);
+        $storage        = Storage::disk('avatars');
+        $storage->assertExists($directoryName);
+        $storage->assertExists($originFilePath);
+        $this->assertTrue(file_exists($manager->path($originFilePath)));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath));
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath));
+
+        $manager->delete($originFilePath);
+
+        $storage->assertMissing($originFilePath);
+        $storage->assertMissing($directoryName);
+    }
+
+    /** @test */
+    public function directory_will_not_be_removed_if_exists_other_file()
+    {
+        $manager = new ImageManager(array_merge(
+            Config::get('simple-image-manager.drivers.avatars'),
+            [
+                'prefix'         => null,
+                'truncateDir'    => true,
+                'deletedFormats' => [
+                    'mini',
+                    'bigger',
+                ],
+            ]
+        ));
+
+        $file           = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $directoryName  = 'fooBar';
+        $fileBaseName   = $directoryName . DIRECTORY_SEPARATOR . Str::uuid();
+        $originFilePath = $manager->upload($file, $fileBaseName);
+        $storage        = Storage::disk('avatars');
+        $storage->assertExists($directoryName);
+        $storage->assertExists($originFilePath);
+        $this->assertTrue(file_exists($manager->path($originFilePath)));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath));
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath));
+
+        $this->assertCount(3, $storage->allFiles());
+        $newFile = $directoryName . DIRECTORY_SEPARATOR . '.gitignore';
+        $storage->put($newFile, '');
+        $storage->assertExists($newFile);
+        $this->assertCount(4, $storage->allFiles());
+
+        $manager->delete($originFilePath);
+
+        $storage->assertMissing($originFilePath);
+        $storage->assertExists($directoryName);
+        $this->assertCount(1, $storage->allFiles());
+        $storage->assertExists($newFile);
+    }
+
+    /** @test */
+    public function directory_will_not_be_removed_if_exists_other_file_in_directory()
+    {
+        $manager = new ImageManager(array_merge(
+            Config::get('simple-image-manager.drivers.avatars'),
+            [
+                'prefix'         => null,
+                'truncateDir'    => true,
+                'deletedFormats' => [
+                    'mini',
+                    'bigger',
+                ],
+            ]
+        ));
+
+        $file           = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $directoryName  = 'fooBar';
+        $fileBaseName   = $directoryName . DIRECTORY_SEPARATOR . Str::uuid();
+        $originFilePath = $manager->upload($file, $fileBaseName);
+        $storage        = Storage::disk('avatars');
+        $storage->assertExists($directoryName);
+        $storage->assertExists($originFilePath);
+        $this->assertTrue(file_exists($manager->path($originFilePath)));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath));
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath));
+
+        $this->assertCount(3, $storage->allFiles());
+        $this->assertCount(1, $storage->allDirectories());
+        $newFile = $directoryName . DIRECTORY_SEPARATOR . 'qux' . DIRECTORY_SEPARATOR . '.gitignore';
+        $storage->put($newFile, '');
+        $storage->assertExists($newFile);
+        $this->assertCount(4, $storage->allFiles());
+        $this->assertCount(2, $storage->allDirectories());
+
+        $manager->delete($originFilePath);
+
+        $storage->assertMissing($originFilePath);
+        $storage->assertExists($directoryName);
+        $this->assertCount(1, $storage->allFiles());
+        $this->assertCount(2, $storage->allDirectories());
+        $storage->assertExists($newFile);
+        $storage->assertExists(dirname($newFile));
+    }
+
+    /** @test */
+    public function directory_will_be_removed_if_exists_other_empty_directory()
+    {
+        $manager = new ImageManager(array_merge(
+            Config::get('simple-image-manager.drivers.avatars'),
+            [
+                'prefix'         => null,
+                'truncateDir'    => true,
+                'deletedFormats' => [
+                    'mini',
+                    'bigger',
+                ],
+            ]
+        ));
+
+        $file           = UploadedFile::fake()->image('avatar.png', 1700, 20);
+        $directoryName  = 'fooBar';
+        $fileBaseName   = $directoryName . DIRECTORY_SEPARATOR . Str::uuid();
+        $originFilePath = $manager->upload($file, $fileBaseName);
+        $storage        = Storage::disk('avatars');
+        $storage->assertExists($directoryName);
+        $storage->assertExists($originFilePath);
+        $this->assertTrue(file_exists($manager->path($originFilePath)));
+        $this->assertEquals($manager->path($originFilePath), $manager->path($originFilePath));
+        $this->assertEquals($manager->url($originFilePath), $manager->url($originFilePath));
+
+        $this->assertCount(3, $storage->allFiles());
+        $this->assertCount(1, $storage->allDirectories());
+        $newDir = $directoryName . DIRECTORY_SEPARATOR . 'qux';
+        $storage->makeDirectory($newDir);
+        $storage->assertExists($newDir);
+        $this->assertCount(3, $storage->allFiles());
+        $this->assertCount(2, $storage->allDirectories());
+
+        $manager->delete($originFilePath);
+
+        $storage->assertMissing($originFilePath);
+        $storage->assertMissing($directoryName);
+        $this->assertCount(0, $storage->allFiles());
+        $this->assertCount(0, $storage->allDirectories());
+        $storage->assertMissing($newDir);
+    }
 }

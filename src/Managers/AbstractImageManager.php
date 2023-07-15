@@ -12,6 +12,8 @@ abstract class AbstractImageManager implements ImageManagerInterface
 {
     public string $disk;
 
+    public bool $truncateDir = false;
+
     public string $prefix = '';
 
     /**
@@ -52,16 +54,25 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
 
         if (array_key_exists('prefix', $configs)) {
-            $this->setPrefix($configs['prefix']);
+            $this->setPrefix((string) $configs['prefix']);
         }
 
+        if (array_key_exists('truncateDir', $configs)) {
+            $this->truncateDir($configs['truncateDir']);
+        }
+
+        /** @deprecated  */
         if (array_key_exists('immutable_extensions', $configs)) {
             $this->setImmutableExtensions($configs['immutable_extensions']);
+        }
+
+        if (array_key_exists('immutableExtensions', $configs)) {
+            $this->setImmutableExtensions($configs['immutableExtensions']);
         }
     }
 
     /**
-     * @param  string|null  $disk
+     * @param string|null $disk
      *
      * @return $this
      */
@@ -77,7 +88,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  bool|array  $original
+     * @param bool|array $original
      *
      * @return $this
      */
@@ -89,7 +100,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  array  $formats
+     * @param array $formats
      *
      * @return $this
      */
@@ -101,7 +112,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  array  $formats
+     * @param array $formats
      *
      * @return $this
      */
@@ -113,7 +124,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  array  $immutableExtensions
+     * @param array $immutableExtensions
      *
      * @return $this
      */
@@ -125,13 +136,24 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  string  $prefix
+     * @param bool $truncateDir
+     * @return $this
+     */
+    public function truncateDir(bool $truncateDir = true): static
+    {
+        $this->truncateDir = $truncateDir;
+
+        return $this;
+    }
+
+    /**
+     * @param ?string $prefix
      *
      * @return $this
      */
-    public function setPrefix(string $prefix = ''): static
+    public function setPrefix(?string $prefix = null): static
     {
-        $this->prefix = $prefix;
+        $this->prefix = (string) $prefix;
 
         return $this;
     }
@@ -147,11 +169,11 @@ abstract class AbstractImageManager implements ImageManagerInterface
             $newFileName = Str::beforeLast($newFileName, ".{$image->extension()}");
         }
 
-        $tmpFile = rtrim(dirname($newFileName), '/').'/.tmp';
+        $tmpFile = rtrim(dirname($newFileName), '/') . '/.tmp';
         $this->storage()->put($tmpFile, '');
         $this->storage()->delete($tmpFile);
 
-        $newFileExt = '.'.$image->extension();
+        $newFileExt = '.' . $image->extension();
 
         if ($this->original) {
             $this->createOriginalFile($image, $newFileName, $newFileExt);
@@ -189,8 +211,11 @@ abstract class AbstractImageManager implements ImageManagerInterface
 
         $isDeleted = $this->storage()->delete(array_unique($filesToDelete));
 
-        if (empty($this->storage()->files($directoryName))) {
-            // $this->storage()->deleteDirectory($directoryName);
+        if (
+            $this->truncateDir &&
+            empty($this->storage()->allFiles($directoryName))
+        ) {
+            $this->storage()->deleteDirectory($directoryName);
         }
 
         return $isDeleted;
@@ -269,7 +294,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
 
         uasort($map, function ($a, $b) {
-            return (int) $b - (int) $a;
+            return (int)$b - (int)$a;
         });
 
         return $map;
@@ -293,17 +318,17 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param  string|null  $fileName
+     * @param string|null $fileName
      *
      * @return string
      */
     protected function makeFileName(?string $fileName = null): string
     {
         if (!$fileName) {
-            return $this->prefix.Str::random(30);
+            return $this->prefix . Str::random(30);
         }
 
-        return $this->prefix.$fileName;
+        return $this->prefix . $fileName;
     }
 
     protected function createOriginalFile(UploadedFile $image, string $newFileName, string $newFileExt)

@@ -25,7 +25,9 @@ return [
     |
     | Driver supported options:
     | - *disk* - laravel filesystem disk (NOTE: currently package support only "local" disks)
-    | - *immutable_extensions* - Extensions what should not be changeable by library
+    | - *immutableExtensions* - Extensions what should not be changeable by library
+    | - *truncateDir* - Clear directory what contained images after deleting directory. Preferable to set it `true` only
+    |    in case if you will have small amount of images, as system calculate allFiles before deletion what can cause memory and timeout exception.
     | - *prefix* - file name prefix (you can specify directory as prefix)
     | - *original* - original  file configuration. You can set as:
     |   - "false" - do not save original file
@@ -40,53 +42,55 @@ return [
     */
 
     'drivers' => [
-        'avatars'        => [
-            'disk'                 => 'avatars',
-            # 'prefix'         => 'some-folder/',
-            'immutable_extensions' => [ '.svg', '.gif' ],
-            'original'             => [
+        'avatars' => [
+            'disk' => 'avatars',
+            # 'prefix'             => 'some-folder/',
+            'truncateDir'         => false,
+            'immutableExtensions' => ['.svg', '.gif'],
+            'original'            => [
                 'methods' => [
-                    'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 500, 500 ],
+                    'fit'      => [\Spatie\Image\Manipulations::FIT_CROP, 500, 500],
                     'optimize' => [],
                 ],
-                'srcset'  => '500w',
+                'srcset' => '500w',
             ],
-            'deletedFormats'       => [],
-            'formats'              => [
+            'deletedFormats' => [],
+            'formats'        => [
                 'medium' => [
                     'methods' => [
-                        'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 250, 250 ],
+                        'fit'      => [\Spatie\Image\Manipulations::FIT_CROP, 250, 250],
                         'optimize' => [],
                     ],
-                    'srcset'  => '250w',
+                    'srcset' => '250w',
                 ],
-                'small'  => [
+                'small' => [
                     'methods' => [
-                        'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 100, 100 ],
+                        'fit'      => [\Spatie\Image\Manipulations::FIT_CROP, 100, 100],
                         'optimize' => [],
                     ],
-                    'srcset'  => '100w',
+                    'srcset' => '100w',
                 ],
             ],
         ],
         'feature-images' => [
-            'disk'                 => 'feature-images',
-            'immutable_extensions' => [ '.svg', '.gif' ],
-            'original'             => [
+            'disk'                => 'feature-images',
+            'truncateDir'         => false,
+            'immutableExtensions' => ['.svg', '.gif'],
+            'original'            => [
                 'methods' => [
-                    'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 2800, 1800 ],
+                    'fit'      => [\Spatie\Image\Manipulations::FIT_CROP, 2800, 1800],
                     'optimize' => [],
                 ],
-                'srcset'  => '2800w',
+                'srcset' => '2800w',
             ],
-            'deletedFormats'       => [],
-            'formats'              => [
+            'deletedFormats' => [],
+            'formats'        => [
                 'thumb' => [
                     'methods' => [
-                        'fit'      => [ \Spatie\Image\Manipulations::FIT_CROP, 450, 300 ],
+                        'fit'      => [\Spatie\Image\Manipulations::FIT_CROP, 450, 300],
                         'optimize' => [],
                     ],
-                    'srcset'  => '450w',
+                    'srcset' => '450w',
                 ],
             ],
         ],
