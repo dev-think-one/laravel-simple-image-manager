@@ -1,11 +1,11 @@
 # Laravel: Simple image manager
 
-![Packagist License](https://img.shields.io/packagist/l/yaroslawww/laravel-simple-image-manager?color=%234dc71f)
-[![Packagist Version](https://img.shields.io/packagist/v/yaroslawww/laravel-simple-image-manager)](https://packagist.org/packages/yaroslawww/laravel-simple-image-manager)
-[![Total Downloads](https://img.shields.io/packagist/dt/yaroslawww/laravel-simple-image-manager)](https://packagist.org/packages/yaroslawww/laravel-simple-image-manager)
-[![Build Status](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/badges/build.png?b=master)](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/build-status/master)
-[![Code Coverage](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/?branch=master)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/yaroslawww/laravel-simple-image-manager/?branch=master)
+![Packagist License](https://img.shields.io/packagist/l/think.studio/laravel-simple-image-manager?color=%234dc71f)
+[![Packagist Version](https://img.shields.io/packagist/v/think.studio/laravel-simple-image-manager)](https://packagist.org/packages/think.studio/laravel-simple-image-manager)
+[![Total Downloads](https://img.shields.io/packagist/dt/think.studio/laravel-simple-image-manager)](https://packagist.org/packages/think.studio/laravel-simple-image-manager)
+[![Build Status](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/badges/build.png?b=main)](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/build-status/main)
+[![Code Coverage](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/badges/coverage.png?b=main)](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/?branch=main)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/dev-think-one/laravel-simple-image-manager/?branch=main)
 
 Simple package to save multiple images formats when upload an image. For example:
 
@@ -23,7 +23,7 @@ in [config file](config/simple-image-manager.php)
 Install the package via composer:
 
 ```bash
-composer require yaroslawww/laravel-simple-image-manager
+composer require think.studio/laravel-simple-image-manager
 ```
 
 You can publish the config file with:
