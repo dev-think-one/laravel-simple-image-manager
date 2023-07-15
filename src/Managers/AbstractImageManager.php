@@ -10,28 +10,54 @@ use Spatie\Image\Image;
 
 abstract class AbstractImageManager implements ImageManagerInterface
 {
-    public string $disk;
+    /**
+     * Use specific disk.
+     *
+     * @var string|null
+     */
+    public ?string $disk = null;
 
+    /**
+     * Clear empty directory after deletion files.
+     * Warning: this function is memory and time-consuming when there can be too many files.
+     *
+     * @var bool
+     */
     public bool $truncateDir = false;
 
+    /**
+     * Add prefix to files. Can be directory ot just filename prefix.
+     *
+     * @var string
+     */
     public string $prefix = '';
 
     /**
-     * @var bool|array
+     * Save original file.
+     *
+     * @var array|null
      */
-    public $original = false;
+    public ?array $original = null;
 
     /**
+     * Formats configurations list for creation.
+     *
      * @var array
      */
     public array $formats = [];
 
     /**
+     * List of deleted configuration formats.
+     * Useful if you deleted some configuration but still files exists for old created files
+     * and you need do delete these formats on delete file.
+     *
      * @var array
      */
     public array $deletedFormats = [];
 
     /**
+     * Files extensions lists what should not be updated/cropped. Like svg or gif.
+     *
      * @var array
      */
     public array $immutableExtensions = [];
@@ -54,14 +80,14 @@ abstract class AbstractImageManager implements ImageManagerInterface
         }
 
         if (array_key_exists('prefix', $configs)) {
-            $this->setPrefix((string) $configs['prefix']);
+            $this->setPrefix((string)$configs['prefix']);
         }
 
         if (array_key_exists('truncateDir', $configs)) {
             $this->truncateDir($configs['truncateDir']);
         }
 
-        /** @deprecated  */
+        /** @deprecated */
         if (array_key_exists('immutable_extensions', $configs)) {
             $this->setImmutableExtensions($configs['immutable_extensions']);
         }
@@ -88,11 +114,11 @@ abstract class AbstractImageManager implements ImageManagerInterface
     }
 
     /**
-     * @param bool|array $original
+     * @param array|null $original
      *
      * @return $this
      */
-    public function setOriginal(bool|array $original = false): static
+    public function setOriginal(?array $original = null): static
     {
         $this->original = $original;
 
@@ -104,7 +130,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
      *
      * @return $this
      */
-    public function setFormats(array $formats): static
+    public function setFormats(array $formats = []): static
     {
         $this->formats = $formats;
 
@@ -153,7 +179,7 @@ abstract class AbstractImageManager implements ImageManagerInterface
      */
     public function setPrefix(?string $prefix = null): static
     {
-        $this->prefix = (string) $prefix;
+        $this->prefix = (string)$prefix;
 
         return $this;
     }
@@ -189,15 +215,34 @@ abstract class AbstractImageManager implements ImageManagerInterface
      */
     public function delete(string $fileName): bool
     {
-        if (!$fileName) {
+        $filesToDelete = $this->filesToDelete($fileName);
+
+        if (empty($filesToDelete)) {
             return false;
+        }
+
+        $isDeleted = $this->storage()->delete($filesToDelete);
+
+        $this->truncateDirectory($fileName);
+
+        return $isDeleted;
+    }
+
+    /**
+     * Get files list with all formats to delete.
+     *
+     * @param string $fileName
+     * @return array
+     */
+    protected function filesToDelete(string $fileName): array
+    {
+        if (!$fileName) {
+            return [];
         }
 
         $filesToDelete = [
             $fileName,
         ];
-
-        $directoryName = dirname($fileName);
 
         [$name, $extension] = $this->explodeFilename($fileName);
 
@@ -209,16 +254,31 @@ abstract class AbstractImageManager implements ImageManagerInterface
             $filesToDelete[] = "{$name}-{$format}.{$extension}";
         }
 
-        $isDeleted = $this->storage()->delete(array_unique($filesToDelete));
+        return array_unique($filesToDelete);
+    }
 
-        if (
-            $this->truncateDir &&
-            empty($this->storage()->allFiles($directoryName))
-        ) {
-            $this->storage()->deleteDirectory($directoryName);
+    /**
+     * Clear empty directory if this is required.
+     *
+     * @param string $fileName
+     * @return bool
+     */
+    protected function truncateDirectory(string $fileName): bool
+    {
+        if (!$this->truncateDir) {
+            return false;
         }
 
-        return $isDeleted;
+        $directoryName = dirname($fileName);
+
+        if (
+            !$directoryName ||
+            !empty($this->storage()->allFiles($directoryName))
+        ) {
+            return false;
+        }
+
+        return $this->storage()->deleteDirectory($directoryName);
     }
 
     /**
