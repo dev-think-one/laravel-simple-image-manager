@@ -184,13 +184,12 @@ class User //...
 
 ```php
 if ($request->hasFile('avatar')) {
-            $user->avatar = $user->avatarUpload(
-                    $request->file('avatar'), 
-                    null /* or some name */
-                );
+    $user->avatar = $user->avatarUpload(
+        $request->file('avatar'), 
+        null /* or some name */
+    );
 }
 $user->save();
-
 
 $url = $user->avatarUrl();
 ```
